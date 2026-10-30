@@ -62,7 +62,9 @@ are required to clone this public repository.
 
 `mu-plugins/` is mounted read-only into WordPress. PHP plugins placed directly in
 this directory load automatically; edit them in Git rather than inside a
-container. WordPress core, uploads, themes, and database content persist in the
+container. Keep the tracked `.gitkeep` in this directory so Git does not remove
+and recreate the directory while it is bind-mounted. WordPress core, uploads,
+themes, and database content persist in the
 named volumes. The bind mount requires a local checkout on the Docker host.
 
 After committing and pushing a change, run on the deployment machine:
@@ -78,7 +80,14 @@ docker-wp." at the bottom of the public site. This provides a visible check
 that a pushed and pulled code change reached WordPress.
 
 Refresh the page after a few seconds: PHP's image defaults may briefly cache
-changed code. An unchanged `up` reuses the containers, volumes, and credentials.
+changed code. If a checkout operation has replaced the mounted directory,
+recreate only the application container to refresh its bind mount:
+
+```sh
+docker compose up -d --force-recreate --wait wordpress
+```
+
+An unchanged ordinary `up` reuses the containers, volumes, and credentials.
 The public clone needs no GitHub login; pushing from your computer requires your
 normal GitHub authentication. Agent account authentication is independent.
 
