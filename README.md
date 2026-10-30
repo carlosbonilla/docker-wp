@@ -41,6 +41,9 @@ are required to clone this public repository.
 3. For access from a trusted LAN, edit `.env` and set
    `WORDPRESS_BIND_ADDRESS` to the machine's LAN IPv4 address or `0.0.0.0`.
    Allow TCP 8080 from that LAN in the VM firewall if one is enabled.
+   In Proxmox, this is a rule on the selected VM: direction `IN`, action
+   `ACCEPT`, interface `net0`, source your LAN CIDR, protocol `TCP`, and
+   destination port `8080` (or the port selected in `.env`).
    Leave the database port unpublished. The default binds HTTP to loopback.
 
 4. Validate and start:
@@ -64,8 +67,8 @@ are required to clone this public repository.
 this directory load automatically; edit them in Git rather than inside a
 container. Keep the tracked `.gitkeep` in this directory so Git does not remove
 and recreate the directory while it is bind-mounted. WordPress core, uploads,
-themes, and database content persist in the
-named volumes. The bind mount requires a local checkout on the Docker host.
+themes, and database content persist in the named volumes. The bind mount
+requires a local checkout on the Docker host.
 
 After committing and pushing a change, run on the deployment machine:
 
@@ -115,6 +118,19 @@ working tree and run `docker compose up -d --wait` again. Database and WordPress
 core upgrades require a separate backup and recovery plan. To withdraw LAN
 access, stop this Compose project and remove only its HTTP allow rule from the
 VM firewall.
+
+## Validated workflow
+
+Validated with WordPress 7.1.4 (PHP 8.3 Apache), MariaDB 11.4.13, and Compose
+5.6.1:
+
+- Public HTTPS clone, followed by a fast-forward pull of a second code change.
+- Browser installation, LAN HTTP access, and a published persistence-check post.
+- `down` followed by `up --wait` preserved the post, both volumes, and `.env`.
+- The repository plugin appeared on the public page after the bind mount was
+  refreshed; repeated ordinary `up` reused both healthy containers.
+- Both services ran as non-root users with read-only root filesystems and all
+  capabilities dropped. Only the WordPress HTTP port was published.
 
 ## References
 
