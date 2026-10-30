@@ -73,6 +73,10 @@ docker compose config --quiet
 docker compose up -d --wait --wait-timeout 180
 ```
 
+The included deployment-check plugin displays "Deployed from GitHub with
+docker-wp." at the bottom of the public site. This provides a visible check
+that a pushed and pulled code change reached WordPress.
+
 Refresh the page after a few seconds: PHP's image defaults may briefly cache
 changed code. An unchanged `up` reuses the containers, volumes, and credentials.
 The public clone needs no GitHub login; pushing from your computer requires your
